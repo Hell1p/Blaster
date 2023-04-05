@@ -32,6 +32,10 @@ protected:
 	void Turn(float Value);
 	void LookUp(float Value);
 	void EquipButtonPressed();
+	void CrouchButtonPressed();
+	void CrouchButtonReleased();
+	void AimButtonPressed();
+	void AimButtonReleased();
 	
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -51,9 +55,14 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Combat)
 	UCombatComponent* Combat;
+
+	UFUNCTION(Server, Reliable)
+	void ServerEquipButtonPressed();
 	
 public:
-	FORCEINLINE void SetOverlappingWeapon(AWeapon* Weapon);
+	void SetOverlappingWeapon(AWeapon* Weapon);
+	bool IsWeaponEquipped();
+	bool IsAiming();
 
 };
 
