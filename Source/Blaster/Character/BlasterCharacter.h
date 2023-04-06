@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Blaster/BlasterComponents/CombatComponent.h"
 #include "GameFramework/Character.h"
+#include "Blaster/TurningInPlace.h"
 #include "BlasterCharacter.generated.h"
 
 class USpringArmComponent;
@@ -36,6 +38,8 @@ protected:
 	void CrouchButtonReleased();
 	void AimButtonPressed();
 	void AimButtonReleased();
+
+	void AimOffset(float DeltaTime);
 	
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -58,12 +62,23 @@ private:
 
 	UFUNCTION(Server, Reliable)
 	void ServerEquipButtonPressed();
+
+	float AO_Yaw;
+	float AO_Pitch;
+	float InterpAO_Yaw;
+	FRotator StartingAimRotation;
+
+	ETurningInPlace TurningInPlace;
+	void TurnInPlace(float DeltaTime);
 	
 public:
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	bool IsWeaponEquipped();
 	bool IsAiming();
-
+	FORCEINLINE float GetAOYaw() const { return AO_Yaw; }
+	FORCEINLINE float GetAOPitch() const { return AO_Pitch; }
+	AWeapon* GetEquippedWeapon();
+	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; }
 };
 
 
