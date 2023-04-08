@@ -13,6 +13,7 @@
 #include "DrawDebugHelpers.h"
 #include "Blaster/PlayerController/BlasterPlayerController.h"
 #include "Blaster/HUD/BlasterHUD.h"
+#include "TimerManager.h"
 
 
 UCombatComponent::UCombatComponent()
@@ -96,9 +97,13 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 
 	if(bFireButtonPressed)
 	{
-		FHitResult HitResult;
-		TraceUnderCrosshairs(HitResult);
-		ServerFire(HitResult.ImpactPoint);
+		if(bCanFire)
+		{
+			FHitResult HitResult;
+			TraceUnderCrosshairs(HitResult);         // TODO: can be refactored along with line 171
+			ServerFire(HitResult.ImpactPoint);
+			StartFireTimer();
+		}
 	}
 }
 
@@ -152,6 +157,31 @@ void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 				HUDPackage.CrosshairsBottom = nullptr;
 			}
 			HUD->SetHUDPackage(HUDPackage);
+		}
+	}
+}
+
+void UCombatComponent::StartFireTimer()
+{
+	if(EquippedWeapon == nullptr || Character == nullptr) return;
+	Character->GetWorldTimerManager().SetTimer(FireTimer, this, &UCombatComponent::FireTimerFinished, EquippedWeapon->FireDelay);
+}
+
+void UCombatComponent::FireTimerFinished()
+{
+	bCanFire = true;
+
+	if(EquippedWeapon == nullptr) return;
+	
+	if(bFireButtonPressed && EquippedWeapon->bAutomatic)
+	{
+		if(bCanFire)
+		{
+			FHitResult HitResult;
+			TraceUnderCrosshairs(HitResult);           // TODO: can be refactored
+			ServerFire(HitResult.ImpactPoint);
+		
+			StartFireTimer();
 		}
 	}
 }

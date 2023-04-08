@@ -67,6 +67,14 @@ private:
 	float AimWalkSpeed;
 	
 	bool bFireButtonPressed;
+
+	/** Automatic fire*/
+	FTimerHandle FireTimer;
+	
+	bool bCanFire = true;
+
+	void StartFireTimer();
+	void FireTimerFinished();
 	
 public:	
 	
